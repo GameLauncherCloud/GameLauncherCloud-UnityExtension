@@ -125,7 +125,7 @@ Different environments require different API keys:
 
 - **Development:** Use test API keys from local database
 - **Staging:** Use staging API keys from staging.app.gamelauncher.cloud
-- **Production:** Use production API keys from app.gamelaunchercloud.com
+- **Production:** Use production API keys from app.gamelauncher.cloud
 
 The extension automatically connects to the correct backend based on the selected environment.
 
@@ -190,7 +190,7 @@ GLCConfigManager.SaveConfig(config);
 
 For questions about the developer environment:
 - 💬 Internal Slack: #unity-extension-dev
-- 📧 Email: dev@gamelaunchercloud.com
+- 📧 Email: dev@gamelauncher.cloud
 - 📚 Backend Docs: Check appsettings files
 
 ---

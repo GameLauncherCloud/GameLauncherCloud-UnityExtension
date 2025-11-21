@@ -61,6 +61,9 @@ namespace GameLauncherCloud.Editor
         private bool isBuilding = false;
         private bool isUploading = false;
         private bool isMonitoringBuild = false;
+        private bool buildCompletedDialogShown = false;
+        private long completedBuildId = 0;
+        private long completedBuildAppId = 0;
         private float uploadProgress = 0f;
         private string buildMessage = "";
         private MessageType buildMessageType = MessageType.Info;
@@ -239,9 +242,13 @@ namespace GameLauncherCloud.Editor
             EditorGUILayout.Space(5);
 
             // Modern tab bar
-            DrawModernTabs();
-
-            EditorGUILayout.Space(10);
+            bool tabsDrawn = DrawModernTabs();
+            
+            // Only add space if tabs were drawn
+            if (tabsDrawn)
+            {
+                EditorGUILayout.Space(10);
+            }
 
             // Content area with scroll view
             Vector2 scrollPosition = Vector2.zero;
@@ -458,11 +465,8 @@ namespace GameLauncherCloud.Editor
             EditorGUILayout.EndVertical();
         }
 
-        private void DrawModernTabs()
+        private bool DrawModernTabs()
         {
-            EditorGUILayout.BeginHorizontal();
-            GUILayout.Space(10);
-
             // Select tab names based on authentication status
             string[] currentTabNames;
             if (!GLCConfigManager.IsAuthenticated())
@@ -477,6 +481,13 @@ namespace GameLauncherCloud.Editor
             {
                 currentTabNames = tabNamesAuth;
             }
+
+            // Don't show tabs if there's only one tab
+            if (currentTabNames.Length <= 1)
+                return false;
+
+            EditorGUILayout.BeginHorizontal();
+            GUILayout.Space(10);
 
             // Custom tab buttons with epic styling
             for (int i = 0; i < currentTabNames.Length; i++)
@@ -501,6 +512,8 @@ namespace GameLauncherCloud.Editor
 
             GUILayout.Space(10);
             EditorGUILayout.EndHorizontal();
+            
+            return true;
         }
 
         private void DrawFooter()
@@ -1109,6 +1122,25 @@ namespace GameLauncherCloud.Editor
                 {
                     EditorGUILayout.Space(10);
                     DrawInfoBox(buildMessage, buildMessageType);
+                    
+                    // Show button to view completed build in dashboard
+                    if (buildMessageType == MessageType.Info && completedBuildId > 0)
+                    {
+                        EditorGUILayout.Space(8);
+                        
+                        GUIStyle viewBuildButtonStyle = new GUIStyle(buttonStyle);
+                        viewBuildButtonStyle.fontSize = 13;
+                        viewBuildButtonStyle.fontStyle = FontStyle.Bold;
+                        viewBuildButtonStyle.normal.background = MakeTex(2, 2, new Color(0.2f, 0.6f, 0.9f, 1f));
+                        viewBuildButtonStyle.hover.background = MakeTex(2, 2, new Color(0.3f, 0.7f, 1f, 1f));
+                        viewBuildButtonStyle.normal.textColor = Color.white;
+                        viewBuildButtonStyle.hover.textColor = Color.white;
+                        
+                        if (GUILayout.Button($"View Build #{completedBuildId} in Dashboard", viewBuildButtonStyle, GUILayout.Height(38)))
+                        {
+                            Application.OpenURL($"{config.GetFrontendUrl()}/apps/id/{completedBuildAppId}/builds");
+                        }
+                    }
                 }
 
                 // Build Status Section
@@ -1276,6 +1308,7 @@ namespace GameLauncherCloud.Editor
                 }
 
                 isUploading = true;
+                buildCompletedDialogShown = false;
                 buildMessage = "Starting upload...";
                 buildMessageType = MessageType.Info;
                 EditorApplication.delayCall += () =>
@@ -1862,17 +1895,23 @@ namespace GameLauncherCloud.Editor
                                     buildMessageType = MessageType.Info;
                                     isMonitoring = false;
                                     isMonitoringBuild = false;
+                                    completedBuildId = appBuildId;
+                                    completedBuildAppId = response.AppId;
 
-                                    // Show success dialog
-                                    EditorApplication.delayCall += () =>
+                                    // Show success dialog only once
+                                    if (!buildCompletedDialogShown)
                                     {
-                                        if (EditorUtility.DisplayDialog("Build Completed",
-                                            $"Build #{appBuildId} processed successfully!\n\nDo you want to view it in Game Launcher Cloud?",
-                                            "Yes", "No"))
+                                        buildCompletedDialogShown = true;
+                                        EditorApplication.delayCall += () =>
                                         {
-                                            Application.OpenURL($"{config.GetFrontendUrl()}/apps/id/{response.AppId}/builds");
-                                        }
-                                    };
+                                            if (EditorUtility.DisplayDialog("Build Completed",
+                                                $"Build #{appBuildId} processed successfully!\n\nDo you want to view it in Game Launcher Cloud?",
+                                                "Yes", "No"))
+                                            {
+                                                Application.OpenURL($"{config.GetFrontendUrl()}/apps/id/{response.AppId}/builds");
+                                            }
+                                        };
+                                    }
                                 }
                                 else if (response.Status == "Failed")
                                 {

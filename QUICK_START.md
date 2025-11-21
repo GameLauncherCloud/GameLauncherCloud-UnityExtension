@@ -5,12 +5,12 @@
 
 Before you start, make sure you have:
 - ✅ Unity 2020.3 or newer installed
-- ✅ A Game Launcher Cloud account ([Sign up here](https://app.gamelaunchercloud.com))
+- ✅ A Game Launcher Cloud account ([Sign up here](https://app.gamelauncher.cloud))
 - ✅ At least one app created in your Game Launcher Cloud dashboard
 
 ### 🔑 Step 1: Get Your API Key
 
-1. Log in to [Game Launcher Cloud Dashboard](https://app.gamelaunchercloud.com)
+1. Log in to [Game Launcher Cloud Dashboard](https://app.gamelauncher.cloud)
 2. Navigate to **Settings** → **API Keys**
 3. Click **Create New API Key**
 4. Give it a name (e.g., "Unity Extension")
@@ -65,7 +65,7 @@ Before you start, make sure you have:
 ### 🎉 You're Done!
 
 Your game build has been uploaded to Game Launcher Cloud and is being processed. You can now:
-- View your build in the [Game Launcher Cloud Dashboard](https://app.gamelaunchercloud.com)
+- View your build in the [Game Launcher Cloud Dashboard](https://app.gamelauncher.cloud)
 - Share it with your team
 - Distribute it to players
 - Track downloads and analytics
@@ -106,9 +106,9 @@ Your game build has been uploaded to Game Launcher Cloud and is being processed.
 
 ## 📞 Need More Help?
 
-- 📧 Email: support@gamelaunchercloud.com
+- 📧 Email: support@gamelauncher.cloud
 - 💬 Discord: [Join our community](https://discord.com/invite/FpWvUQ2CJP)
-- 📚 Full Documentation: [docs.gamelaunchercloud.com](https://docs.gamelaunchercloud.com)
+- 📚 Full Documentation: [docs.gamelauncher.cloud](https://docs.gamelauncher.cloud)
 - 🐛 Report bugs: [GitHub Issues](https://github.com/GameLauncherCloud/GameLauncherCloud-UnityExtension/issues)
 
 ---

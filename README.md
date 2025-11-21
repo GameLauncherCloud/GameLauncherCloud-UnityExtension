@@ -2,7 +2,7 @@
 
 **Promote your game development with Game Launcher Cloud!**
 
-A powerful Unity Editor extension that allows you to build and upload your game patches directly to [Game Launcher Cloud](https://gamelaunchercloud.com) platform from within Unity.
+A powerful Unity Editor extension that allows you to build and upload your game patches directly to [Game Launcher Cloud](https://gamelauncher.cloud) platform from within Unity.
 
 ## 🌟 Features
 
@@ -34,7 +34,7 @@ A powerful Unity Editor extension that allows you to build and upload your game 
 
 ### Step 1: Get Your API Key
 
-1. Go to [Game Launcher Cloud Dashboard](https://app.gamelaunchercloud.com)
+1. Go to [Game Launcher Cloud Dashboard](https://app.gamelauncher.cloud)
 2. Navigate to **Settings > API Keys**
 3. Click **Create New API Key**
 4. Copy your API key
@@ -62,7 +62,7 @@ A powerful Unity Editor extension that allows you to build and upload your game 
 The extension supports authentication via **API Keys**. This is the recommended method for automated builds and CI/CD pipelines.
 
 To get an API Key:
-- Visit [Game Launcher Cloud Dashboard](https://app.gamelaunchercloud.com/dashboard/settings/api-keys)
+- Visit [Game Launcher Cloud Dashboard](https://app.gamelauncher.cloud/dashboard/settings/api-keys)
 - Create a new API key with appropriate permissions
 - Copy and save the key securely
 
@@ -119,10 +119,10 @@ Always include:
 
 Need help? We're here for you!
 
-- 📧 Email: support@gamelaunchercloud.com
+- 📧 Email: support@gamelauncher.cloud
 - 💬 Discord: [Join our community](https://discord.com/invite/FpWvUQ2CJP)
-- 📚 Documentation: [docs.gamelaunchercloud.com](https://docs.gamelaunchercloud.com)
-- 🌐 Website: [gamelaunchercloud.com](https://gamelaunchercloud.com)
+- 📚 Documentation: [docs.gamelauncher.cloud](https://docs.gamelauncher.cloud)
+- 🌐 Website: [gamelauncher.cloud](https://gamelauncher.cloud)
 
 ## 📝 License
 
@@ -136,7 +136,7 @@ Game Launcher Cloud is a comprehensive platform for game developers to:
 - Track downloads and analytics
 - Provide seamless updates to players
 
-Visit [gamelaunchercloud.com](https://gamelaunchercloud.com) to learn more!
+Visit [gamelauncher.cloud](https://gamelauncher.cloud) to learn more!
 
 ---
 

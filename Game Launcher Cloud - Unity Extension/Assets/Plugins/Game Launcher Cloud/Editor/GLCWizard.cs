@@ -604,10 +604,14 @@ namespace GameLauncherCloud.Editor
         
         private void DrawNavigationButtons()
         {
+            // Don't show navigation buttons on the completion step
+            if (currentStep == TOTAL_STEPS - 1)
+                return;
+            
             GUILayout.BeginHorizontal();
             
             // Back button
-            GUI.enabled = currentStep > 0 && currentStep < 3;
+            GUI.enabled = currentStep > 0;
             if (GUILayout.Button("← Back", buttonStyle, GUILayout.Height(35), GUILayout.Width(100)))
             {
                 currentStep--;
@@ -617,23 +621,14 @@ namespace GameLauncherCloud.Editor
             
             GUILayout.FlexibleSpace();
             
-            // Next/Finish button
+            // Next button
             bool canProceed = CanProceedToNextStep();
             
             GUI.enabled = canProceed;
             
-            string buttonText = currentStep == TOTAL_STEPS - 1 ? "Finish" : "Next →";
-            
-            if (GUILayout.Button(buttonText, primaryButtonStyle, GUILayout.Height(35), GUILayout.Width(100)))
+            if (GUILayout.Button("Next →", primaryButtonStyle, GUILayout.Height(35), GUILayout.Width(100)))
             {
-                if (currentStep == TOTAL_STEPS - 1)
-                {
-                    FinishWizard();
-                }
-                else
-                {
-                    currentStep++;
-                }
+                currentStep++;
             }
             
             GUI.enabled = true;

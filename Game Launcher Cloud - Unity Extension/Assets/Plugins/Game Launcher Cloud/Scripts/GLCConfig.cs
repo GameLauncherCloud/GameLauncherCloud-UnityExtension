@@ -112,7 +112,7 @@ namespace GameLauncherCloud
                     return "https://staging.app.gamelauncher.cloud";
                 case GLCEnvironment.Production:
                 default:
-                    return "https://app.gamelaunchercloud.com";
+                    return "https://app.gamelauncher.cloud";
             }
         }
     }

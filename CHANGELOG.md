@@ -72,5 +72,5 @@ All notable changes to Game Launcher Cloud - Manager for Unity will be documente
 
 ---
 
-For detailed documentation, visit: https://docs.gamelaunchercloud.com
+For detailed documentation, visit: https://docs.gamelauncher.cloud
 For support, join our Discord: https://discord.com/invite/FpWvUQ2CJP

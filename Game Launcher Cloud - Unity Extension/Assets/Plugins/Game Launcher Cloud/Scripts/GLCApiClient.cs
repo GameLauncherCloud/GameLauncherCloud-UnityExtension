@@ -255,11 +255,11 @@ namespace GameLauncherCloud
         }
 
         /// <summary>
-        /// Start upload process - get presigned URL for file upload (async method - no coroutines)
+        /// Start upload process - get presigned URL for file upload (async method)
         /// </summary>
         public async void StartUploadAsync(long appId, string fileName, long fileSize, long? uncompressedFileSize, string buildNotes, Action<bool, string, StartUploadResponse> callback)
         {
-            UnityEngine.Debug.LogWarning($"[GLC] ★★★★★ STARTUPLOAD ASYNC METHOD - NO COROUTINES ★★★★★");
+            UnityEngine.Debug.LogWarning($"[GLC] ★★★★★ STARTING UPLOAD ★★★★★");
 
             if (string.IsNullOrEmpty(authToken))
             {
@@ -474,8 +474,8 @@ namespace GameLauncherCloud
                 using (var client = new HttpClient(handler))
                 using (var fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read, MultipartUploadHelper.GetBufferSize(), useAsync: true))
                 {
-                    client.Timeout = TimeSpan.FromHours(1); // 1 hour timeout for large files
-                    UnityEngine.Debug.Log($"[GLC] HttpClient created with 1 hour timeout");
+                    client.Timeout = TimeSpan.FromHours(6);
+                    UnityEngine.Debug.Log($"[GLC] HttpClient created with {TimeSpan.FromHours(6)} hours timeout");
                     UnityEngine.Debug.Log($"[GLC] Using buffer size: {MultipartUploadHelper.GetBufferSize()} bytes (CLI standard)");
 
                     // Create a custom StreamContent to track progress (matches CLI implementation)

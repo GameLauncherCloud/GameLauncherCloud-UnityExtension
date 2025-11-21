@@ -16,19 +16,19 @@
   "category": "Tools",
   "author": {
     "name": "Game Launcher Cloud",
-    "email": "support@gamelaunchercloud.com",
-    "url": "https://gamelaunchercloud.com"
+    "email": "support@gamelauncher.cloud",
+    "url": "https://gamelauncher.cloud"
   },
   "license": "Proprietary",
-  "homepage": "https://gamelaunchercloud.com",
+  "homepage": "https://gamelauncher.cloud",
   "repository": {
     "type": "git",
     "url": "https://github.com/GameLauncherCloud/GameLauncherCloud-UnityExtension.git"
   },
   "bugs": {
     "url": "https://github.com/GameLauncherCloud/GameLauncherCloud-UnityExtension/issues",
-    "email": "support@gamelaunchercloud.com"
+    "email": "support@gamelauncher.cloud"
   },
-  "documentation": "https://docs.gamelaunchercloud.com",
+  "documentation": "https://docs.gamelauncher.cloud",
   "changelogUrl": "https://github.com/GameLauncherCloud/GameLauncherCloud-UnityExtension/blob/main/CHANGELOG.md"
 }

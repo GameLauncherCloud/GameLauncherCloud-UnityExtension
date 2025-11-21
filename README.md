@@ -121,7 +121,7 @@ Need help? We're here for you!
 
 - 📧 Email: support@gamelauncher.cloud
 - 💬 Discord: [Join our community](https://discord.com/invite/FpWvUQ2CJP)
-- 📚 Documentation: [docs.gamelauncher.cloud](https://docs.gamelauncher.cloud)
+- 📚 Documentation: [docs.gamelauncher.cloud](https://help.gamelauncher.cloud)
 - 🌐 Website: [gamelauncher.cloud](https://gamelauncher.cloud)
 
 ## 📝 License

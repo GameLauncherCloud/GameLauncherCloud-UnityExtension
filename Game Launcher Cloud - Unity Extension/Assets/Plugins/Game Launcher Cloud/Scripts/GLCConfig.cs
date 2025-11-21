@@ -34,10 +34,6 @@ namespace GameLauncherCloud
         public string lastBuildPath = "";
         public bool autoOpenAfterBuild = false;
         
-        // Tips settings
-        public bool showTipsOnStartup = true;
-        public string lastTipShown = "";
-        
         // Developer settings (not visible to end users)
         public GLCEnvironment environment = GLCEnvironment.Production;
         public bool showDeveloperTab = true;

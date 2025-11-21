@@ -1,7 +1,7 @@
 using System.Collections;
 using UnityEngine;
 
-namespace GameLauncher
+namespace GameLauncherCloud
 {
     public class OpenURL : MonoBehaviour
     {

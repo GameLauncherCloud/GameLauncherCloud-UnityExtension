@@ -10,7 +10,7 @@ namespace GameLauncherCloud.Editor
 {
     /// <summary>
     /// Main editor window for Game Launcher Cloud Unity Extension
-    /// Provides UI for authentication, build & upload, and tips
+    /// Provides UI for authentication and build & upload
     /// </summary>
     public class GLCManagerWindow : EditorWindow
     {
@@ -228,35 +228,49 @@ namespace GameLauncherCloud.Editor
 
             GUILayout.FlexibleSpace();
 
+            // Quick access links
+            GUIStyle linkStyle = new GUIStyle(GUI.skin.button);
+            linkStyle.fontSize = 10;
+            linkStyle.padding = new RectOffset(8, 8, 4, 4);
+            linkStyle.normal.textColor = new Color(0.7f, 0.9f, 1f);
+            
+            if (GUILayout.Button("📚 Docs", linkStyle, GUILayout.Height(22), GUILayout.Width(60)))
+            {
+                Application.OpenURL("https://help.gamelauncher.cloud");
+            }
+            
+            if (GUILayout.Button("💬 Discord", linkStyle, GUILayout.Height(22), GUILayout.Width(70)))
+            {
+                Application.OpenURL("https://discord.gg/gamelauncher");
+            }
+
+            GUILayout.Space(10);
+
             // Status indicator and Logout button
             if (GLCConfigManager.IsAuthenticated())
             {
                 EditorGUILayout.BeginVertical();
-                EditorGUILayout.BeginHorizontal();
                 
-                EditorGUILayout.BeginVertical();
                 GUILayout.Label("✓ Connected", new GUIStyle(subtitleStyle) { normal = new GUIStyleState { textColor = new Color(0.4f, 1f, 0.4f) } });
                 GUILayout.Label(config.userEmail, new GUIStyle(subtitleStyle) { fontSize = 10 });
                 if (!string.IsNullOrEmpty(config.userPlan))
                 {
                     GUILayout.Label($"Plan: {config.userPlan}", new GUIStyle(subtitleStyle) { fontSize = 9, normal = new GUIStyleState { textColor = new Color(0.8f, 0.9f, 1f, 0.8f) } });
                 }
-                EditorGUILayout.EndVertical();
                 
-                GUILayout.Space(10);
+                EditorGUILayout.Space(3);
                 
                 // Logout button
                 GUIStyle logoutButtonStyle = new GUIStyle(GUI.skin.button);
-                logoutButtonStyle.fontSize = 10;
-                logoutButtonStyle.padding = new RectOffset(10, 10, 4, 4);
+                logoutButtonStyle.fontSize = 9;
+                logoutButtonStyle.padding = new RectOffset(8, 8, 3, 3);
                 logoutButtonStyle.normal.textColor = new Color(1f, 0.8f, 0.8f);
                 
-                if (GUILayout.Button("Logout", logoutButtonStyle, GUILayout.Height(22), GUILayout.Width(60)))
+                if (GUILayout.Button("Logout", logoutButtonStyle, GUILayout.Height(20), GUILayout.Width(55)))
                 {
                     Logout();
                 }
                 
-                EditorGUILayout.EndHorizontal();
                 EditorGUILayout.EndVertical();
             }
             else
@@ -566,6 +580,23 @@ namespace GameLauncherCloud.Editor
             GUILayout.Label("🚀 Build & Deploy", sectionHeaderStyle);
             EditorGUILayout.Space(10);
 
+            // CLI Warning for large builds
+            EditorGUILayout.BeginHorizontal(EditorStyles.helpBox);
+            GUILayout.Label("⚠️", new GUIStyle(EditorStyles.boldLabel) { fontSize = 16 }, GUILayout.Width(25));
+            EditorGUILayout.BeginVertical();
+            GUILayout.Label("For large builds (>5GB), we recommend using the CLI", EditorStyles.wordWrappedLabel);
+            EditorGUILayout.BeginHorizontal();
+            GUILayout.Label("The CLI is optimized for heavy builds with multipart upload.", EditorStyles.miniLabel);
+            if (GUILayout.Button("Learn More", EditorStyles.linkLabel, GUILayout.ExpandWidth(false)))
+            {
+                Application.OpenURL("https://help.gamelauncher.cloud/applications/cli-releases");
+            }
+            EditorGUILayout.EndHorizontal();
+            EditorGUILayout.EndVertical();
+            EditorGUILayout.EndHorizontal();
+
+            EditorGUILayout.Space(10);
+
             // Load Apps Button
             if (availableApps == null || availableApps.Length == 0)
             {
@@ -617,13 +648,27 @@ namespace GameLauncherCloud.Editor
                         LoadApps();
                     }
                     
-                    if (GUILayout.Button("⚙️ Manage Apps", EditorStyles.miniButton, GUILayout.Height(22)))
+                    if (GUILayout.Button("⚙️ Manage App", EditorStyles.miniButton, GUILayout.Height(22)))
                     {
-                        Application.OpenURL("https://app.gamelauncher.cloud/dashboard");
+                        if (availableApps != null && selectedAppIndex < availableApps.Length)
+                        {
+                            long appId = availableApps[selectedAppIndex].Id;
+                            string url = $"{config.GetFrontendUrl()}/apps/id/{appId}/overview";
+                            Application.OpenURL(url);
+                        }
                     }
                     
                     EditorGUILayout.EndHorizontal();
                 }, new Color(0.95f, 0.95f, 1f, 0.3f));
+
+                EditorGUILayout.Space(5);
+
+                // Open Dashboard Button
+                if (GUILayout.Button("📊 Open Dashboard", buttonStyle, GUILayout.Height(32)))
+                {
+                    string url = $"{config.GetFrontendUrl()}/dashboard";
+                    Application.OpenURL(url);
+                }
 
                 EditorGUILayout.Space(10);
 
@@ -1371,12 +1416,6 @@ namespace GameLauncherCloud.Editor
                 _ => "📊"
             };
         }
-
-        // ========== TIPS TAB ========== //
-
-
-
-
 
         // ========== DEVELOPER TAB ========== //
 

@@ -1,0 +1,18 @@
+{
+  "apiKey": "",
+  "authToken": "",
+  "userId": "",
+  "userEmail": "",
+  "selectedAppId": 0,
+  "selectedAppName": "",
+  "rememberMe": true,
+  "apiBaseUrl": "https://api.gamelaunchercloud.com",
+  "buildNotes": "",
+  "lastBuildPath": "",
+  "autoOpenAfterBuild": false,
+  "compressBeforeUpload": true,
+  "showTipsOnStartup": true,
+  "lastTipShown": "",
+  "environment": 0,
+  "showDeveloperTab": false
+}

@@ -1,0 +1,34 @@
+{
+  "name": "com.gamelaunchercloud.unity-manager",
+  "displayName": "Game Launcher Cloud - Manager for Unity",
+  "version": "1.0.0",
+  "unity": "2020.3",
+  "description": "Build and upload your Unity game patches directly to Game Launcher Cloud platform. Features include API key authentication, one-click build & upload, real-time progress tracking, and helpful tips for optimization.",
+  "keywords": [
+    "game launcher cloud",
+    "patch",
+    "build",
+    "upload",
+    "distribution",
+    "game development",
+    "deployment"
+  ],
+  "category": "Tools",
+  "author": {
+    "name": "Game Launcher Cloud",
+    "email": "support@gamelaunchercloud.com",
+    "url": "https://gamelaunchercloud.com"
+  },
+  "license": "Proprietary",
+  "homepage": "https://gamelaunchercloud.com",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/GameLauncherCloud/GameLauncherCloud-UnityExtension.git"
+  },
+  "bugs": {
+    "url": "https://github.com/GameLauncherCloud/GameLauncherCloud-UnityExtension/issues",
+    "email": "support@gamelaunchercloud.com"
+  },
+  "documentation": "https://docs.gamelaunchercloud.com",
+  "changelogUrl": "https://github.com/GameLauncherCloud/GameLauncherCloud-UnityExtension/blob/main/CHANGELOG.md"
+}

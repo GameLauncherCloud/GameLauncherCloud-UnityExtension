@@ -36,7 +36,6 @@ namespace GameLauncherCloud
         
         // Developer settings (not visible to end users)
         public GLCEnvironment environment = GLCEnvironment.Production;
-        public bool showDeveloperTab = true;
         
         /// <summary>
         /// Get API URL based on selected environment

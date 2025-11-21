@@ -124,7 +124,7 @@ namespace GameLauncherCloud.Editor
         
         // ========== WINDOW INITIALIZATION ========== //
         
-        [MenuItem("Tools/Game Launcher Cloud - Setup Wizard", false, 0)]
+        [MenuItem("Tools/Game Launcher Cloud - Setup Wizard", false, 100)]
         public static void ShowWizard()
         {
             GLCWizard window = GetWindow<GLCWizard>("GLC Setup Wizard");

@@ -33,7 +33,6 @@ namespace GameLauncherCloud
         public string buildNotes = "";
         public string lastBuildPath = "";
         public bool autoOpenAfterBuild = false;
-        public bool compressBeforeUpload = true;
         
         // Tips settings
         public bool showTipsOnStartup = true;

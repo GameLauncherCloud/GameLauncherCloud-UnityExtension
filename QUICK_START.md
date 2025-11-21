@@ -107,7 +107,7 @@ Your game build has been uploaded to Game Launcher Cloud and is being processed.
 ## 📞 Need More Help?
 
 - 📧 Email: support@gamelaunchercloud.com
-- 💬 Discord: [Join our community](https://discord.gg/gamelaunchercloud)
+- 💬 Discord: [Join our community](https://discord.com/invite/FpWvUQ2CJP)
 - 📚 Full Documentation: [docs.gamelaunchercloud.com](https://docs.gamelaunchercloud.com)
 - 🐛 Report bugs: [GitHub Issues](https://github.com/GameLauncherCloud/GameLauncherCloud-UnityExtension/issues)
 

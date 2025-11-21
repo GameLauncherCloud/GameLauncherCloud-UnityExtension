@@ -411,7 +411,7 @@ namespace GameLauncherCloud.Editor
 
             if (GUILayout.Button("💬 Discord", headerLinkStyle, GUILayout.Height(24), GUILayout.Width(75)))
             {
-                Application.OpenURL("https://discord.gg/gamelauncher");
+                Application.OpenURL("https://discord.com/invite/FpWvUQ2CJP");
             }
 
             GUILayout.Space(10);

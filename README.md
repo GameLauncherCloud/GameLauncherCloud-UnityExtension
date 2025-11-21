@@ -120,7 +120,7 @@ Always include:
 Need help? We're here for you!
 
 - 📧 Email: support@gamelaunchercloud.com
-- 💬 Discord: [Join our community](https://discord.gg/gamelaunchercloud)
+- 💬 Discord: [Join our community](https://discord.com/invite/FpWvUQ2CJP)
 - 📚 Documentation: [docs.gamelaunchercloud.com](https://docs.gamelaunchercloud.com)
 - 🌐 Website: [gamelaunchercloud.com](https://gamelaunchercloud.com)
 

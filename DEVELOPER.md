@@ -29,7 +29,7 @@ Example:
 The Developer tab provides quick switching between:
 
 #### 🏠 Development
-- **API URL:** `https://localhost:7226`
+- **API URL:** `https://localhost:7226/`
 - **Frontend URL:** `http://localhost:4200`
 - **Database:** Local PostgreSQL
 - **Cloudflare R2:** `game-launcher-cloud-development`

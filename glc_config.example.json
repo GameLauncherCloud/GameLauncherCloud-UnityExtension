@@ -6,7 +6,7 @@
   "selectedAppId": 0,
   "selectedAppName": "",
   "rememberMe": true,
-  "apiBaseUrl": "https://api.gamelaunchercloud.com",
+  "apiBaseUrl": "https://api.gamelauncher.cloud",
   "buildNotes": "",
   "lastBuildPath": "",
   "autoOpenAfterBuild": false,

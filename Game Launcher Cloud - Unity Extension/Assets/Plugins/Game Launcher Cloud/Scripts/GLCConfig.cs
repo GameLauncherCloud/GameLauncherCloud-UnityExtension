@@ -19,7 +19,14 @@ namespace GameLauncherCloud
     [System.Serializable]
     public class GLCConfig
     {
+        // Legacy field for backward compatibility
         public string apiKey = "";
+        
+        // Environment-specific API Keys
+        public string apiKeyProduction = "";
+        public string apiKeyStaging = "";
+        public string apiKeyDevelopment = "";
+        
         public string authToken = "";
         public string userId = "";
         public string userEmail = "";
@@ -27,7 +34,7 @@ namespace GameLauncherCloud
         public long selectedAppId = 0;
         public string selectedAppName = "";
         public bool rememberMe = true;
-        public string apiBaseUrl = "https://api.gamelaunchercloud.com";
+        public string apiBaseUrl = "https://api.gamelauncher.cloud";
         
         // Build settings
         public string buildNotes = "";
@@ -36,6 +43,43 @@ namespace GameLauncherCloud
         
         // Developer settings (not visible to end users)
         public GLCEnvironment environment = GLCEnvironment.Production;
+        
+        /// <summary>
+        /// Get API Key for the current environment
+        /// </summary>
+        public string GetApiKey()
+        {
+            switch (environment)
+            {
+                case GLCEnvironment.Development:
+                    return string.IsNullOrEmpty(apiKeyDevelopment) ? apiKey : apiKeyDevelopment;
+                case GLCEnvironment.Staging:
+                    return string.IsNullOrEmpty(apiKeyStaging) ? apiKey : apiKeyStaging;
+                case GLCEnvironment.Production:
+                default:
+                    return string.IsNullOrEmpty(apiKeyProduction) ? apiKey : apiKeyProduction;
+            }
+        }
+        
+        /// <summary>
+        /// Set API Key for the current environment
+        /// </summary>
+        public void SetApiKey(string key)
+        {
+            switch (environment)
+            {
+                case GLCEnvironment.Development:
+                    apiKeyDevelopment = key;
+                    break;
+                case GLCEnvironment.Staging:
+                    apiKeyStaging = key;
+                    break;
+                case GLCEnvironment.Production:
+                default:
+                    apiKeyProduction = key;
+                    break;
+            }
+        }
         
         /// <summary>
         /// Get API URL based on selected environment
@@ -51,7 +95,7 @@ namespace GameLauncherCloud
                     return "https://stagingapi.gamelauncher.cloud";
                 case GLCEnvironment.Production:
                 default:
-                    return "https://api.gamelaunchercloud.com";
+                    return "https://api.gamelauncher.cloud";
             }
         }
         

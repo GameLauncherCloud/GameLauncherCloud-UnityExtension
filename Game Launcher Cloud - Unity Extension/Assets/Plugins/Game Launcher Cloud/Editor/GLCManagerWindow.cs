@@ -198,10 +198,12 @@ namespace GameLauncherCloud.Editor
             apiClient = new GLCApiClient(config.GetApiUrl(), config.authToken);
             Debug.Log($"[GLC] OnEnable - API Client created");
 
-            if (!string.IsNullOrEmpty(config.apiKey))
+            // Load API Key for current environment
+            string currentApiKey = config.GetApiKey();
+            if (!string.IsNullOrEmpty(currentApiKey))
             {
-                apiKeyInput = config.apiKey;
-                Debug.Log($"[GLC] OnEnable - API Key loaded from config");
+                apiKeyInput = currentApiKey;
+                Debug.Log($"[GLC] OnEnable - API Key loaded from config for environment: {config.environment}");
             }
 
             // Load icon
@@ -705,7 +707,8 @@ namespace GameLauncherCloud.Editor
 
             if (success && response != null)
             {
-                config.apiKey = apiKeyInput;
+                // Save API Key for current environment
+                config.SetApiKey(apiKeyInput);
                 config.authToken = response.Token;
                 config.userId = response.Id;
                 config.userEmail = response.Email;
@@ -1984,6 +1987,19 @@ namespace GameLauncherCloud.Editor
 
                 // Update API client with new URL
                 apiClient = new GLCApiClient(config.GetApiUrl(), config.authToken);
+                
+                // Load API Key for the new environment
+                string newEnvApiKey = config.GetApiKey();
+                if (!string.IsNullOrEmpty(newEnvApiKey))
+                {
+                    apiKeyInput = newEnvApiKey;
+                    Debug.Log($"[GLC] Loaded API Key for environment: {newEnv}");
+                }
+                else
+                {
+                    apiKeyInput = "";
+                    Debug.Log($"[GLC] No API Key found for environment: {newEnv}");
+                }
 
                 GLCConfigManager.SaveConfig(config);
 
@@ -2005,6 +2021,26 @@ namespace GameLauncherCloud.Editor
 
             EditorGUILayout.Space(10);
 
+            // Saved API Keys Info
+            EditorGUILayout.BeginVertical(EditorStyles.helpBox);
+            EditorGUILayout.LabelField("Saved API Keys per Environment:", EditorStyles.boldLabel);
+            EditorGUILayout.Space(5);
+
+            string FormatApiKey(string key)
+            {
+                if (string.IsNullOrEmpty(key)) return "Not set";
+                if (key.Length <= 8) return "••••••••";
+                return key.Substring(0, 4) + "••••" + key.Substring(key.Length - 4);
+            }
+
+            EditorGUILayout.LabelField("Production:", FormatApiKey(config.apiKeyProduction));
+            EditorGUILayout.LabelField("Staging:", FormatApiKey(config.apiKeyStaging));
+            EditorGUILayout.LabelField("Development:", FormatApiKey(config.apiKeyDevelopment));
+
+            EditorGUILayout.EndVertical();
+
+            EditorGUILayout.Space(10);
+
             // Quick Actions
             EditorGUILayout.LabelField("Quick Actions:", EditorStyles.boldLabel);
 
@@ -2014,6 +2050,7 @@ namespace GameLauncherCloud.Editor
             {
                 config.environment = GLCEnvironment.Development;
                 apiClient = new GLCApiClient(config.GetApiUrl(), config.authToken);
+                apiKeyInput = config.GetApiKey();
                 GLCConfigManager.SaveConfig(config);
             }
 
@@ -2021,6 +2058,7 @@ namespace GameLauncherCloud.Editor
             {
                 config.environment = GLCEnvironment.Staging;
                 apiClient = new GLCApiClient(config.GetApiUrl(), config.authToken);
+                apiKeyInput = config.GetApiKey();
                 GLCConfigManager.SaveConfig(config);
             }
 
@@ -2028,6 +2066,7 @@ namespace GameLauncherCloud.Editor
             {
                 config.environment = GLCEnvironment.Production;
                 apiClient = new GLCApiClient(config.GetApiUrl(), config.authToken);
+                apiKeyInput = config.GetApiKey();
                 GLCConfigManager.SaveConfig(config);
             }
 
@@ -2053,8 +2092,8 @@ namespace GameLauncherCloud.Editor
             EditorGUILayout.Space(5);
 
             EditorGUILayout.LabelField("Production:");
-            EditorGUILayout.SelectableLabel("https://api.gamelaunchercloud.com", EditorStyles.miniLabel, GUILayout.Height(16));
-            EditorGUILayout.SelectableLabel("https://app.gamelaunchercloud.com", EditorStyles.miniLabel, GUILayout.Height(16));
+            EditorGUILayout.SelectableLabel("https://api.gamelauncher.cloud", EditorStyles.miniLabel, GUILayout.Height(16));
+            EditorGUILayout.SelectableLabel("https://app.gamelauncher.cloud", EditorStyles.miniLabel, GUILayout.Height(16));
 
             EditorGUILayout.EndVertical();
 

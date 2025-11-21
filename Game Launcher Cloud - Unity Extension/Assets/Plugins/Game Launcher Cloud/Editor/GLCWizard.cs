@@ -139,10 +139,11 @@ namespace GameLauncherCloud.Editor
             apiClient = new GLCApiClient(config.GetApiUrl(), config.authToken);
             icon = Resources.Load<Texture2D>("GameLauncherCloud_Icon");
             
-            // Load saved API key if exists
-            if (!string.IsNullOrEmpty(config.apiKey))
+            // Load saved API key for current environment
+            string currentApiKey = config.GetApiKey();
+            if (!string.IsNullOrEmpty(currentApiKey))
             {
-                apiKeyInput = config.apiKey;
+                apiKeyInput = currentApiKey;
             }
             
             // Check if already configured
@@ -671,7 +672,8 @@ namespace GameLauncherCloud.Editor
                 
                 if (success && loginResponse != null)
                 {
-                    config.apiKey = apiKeyInput;
+                    // Save API Key for current environment
+                    config.SetApiKey(apiKeyInput);
                     config.authToken = loginResponse.Token;
                     config.userId = loginResponse.Id;
                     config.userEmail = loginResponse.Email;

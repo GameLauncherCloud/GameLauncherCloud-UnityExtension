@@ -43,8 +43,8 @@ The Developer tab provides quick switching between:
 - **Stripe:** Test mode
 
 #### 🚀 Production
-- **API URL:** `https://api.gamelaunchercloud.com`
-- **Frontend URL:** `https://app.gamelaunchercloud.com`
+- **API URL:** `https://api.gamelauncher.cloud`
+- **Frontend URL:** `https://app.gamelauncher.cloud`
 - **Database:** Railway Production (mainline)
 - **Cloudflare R2:** `game-launcher-cloud-production`
 - **Stripe:** Live mode

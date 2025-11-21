@@ -20,8 +20,8 @@ namespace GameLauncherCloud.Editor
         private GLCApiClient apiClient;
         private int selectedTab = 0;
         private string[] tabNamesNotAuth = { "Login" };
-        private string[] tabNamesAuth = { "Build & Upload", "Tips" };
-        private string[] devTabNamesAuth = { "Build & Upload", "Tips", "Developer" };
+        private string[] tabNamesAuth = { "Build & Upload" };
+        private string[] devTabNamesAuth = { "Build & Upload", "Developer" };
 
         // ========== STYLES ========== //
 
@@ -55,14 +55,10 @@ namespace GameLauncherCloud.Editor
         private bool isLoadingApps = false;
         private bool isBuilding = false;
         private bool isUploading = false;
+        private bool isMonitoringBuild = false;
         private float uploadProgress = 0f;
         private string buildMessage = "";
         private MessageType buildMessageType = MessageType.Info;
-
-        // ========== TIPS TAB ========== //
-
-        private Vector2 tipsScrollPosition;
-        private List<TipItem> tips = new List<TipItem>();
 
         // ========== MENU ITEM ========== //
 
@@ -94,8 +90,6 @@ namespace GameLauncherCloud.Editor
 
             // Load icon
             icon = Resources.Load<Texture2D>("GameLauncherCloud_Icon");
-
-            InitializeTips();
         }
 
         private void OnGUI()
@@ -131,10 +125,6 @@ namespace GameLauncherCloud.Editor
                         break;
 
                     case 1:
-                        DrawTipsTab();
-                        break;
-
-                    case 2:
                         if (config.showDeveloperTab)
                         {
                             DrawDeveloperTab();
@@ -708,6 +698,31 @@ namespace GameLauncherCloud.Editor
                     EditorGUILayout.Space(10);
                     DrawInfoBox(buildMessage, buildMessageType);
                 }
+
+                // Build Status Section
+                if (isMonitoringBuild)
+                {
+                    EditorGUILayout.Space(15);
+                    
+                    GUILayout.Label("Build Status", new GUIStyle(EditorStyles.boldLabel) 
+                    { 
+                        fontSize = 14,
+                        normal = { textColor = new Color(0.3f, 0.3f, 0.3f) }
+                    });
+                    
+                    EditorGUILayout.Space(5);
+                    
+                    DrawCard(() =>
+                    {
+                        EditorGUILayout.BeginHorizontal();
+                        GUILayout.Label("📊", new GUIStyle(EditorStyles.boldLabel) { fontSize = 20 }, GUILayout.Width(30));
+                        EditorGUILayout.BeginVertical();
+                        GUILayout.Label("Processing build on server...", EditorStyles.boldLabel);
+                        GUILayout.Label("This may take several minutes", EditorStyles.miniLabel);
+                        EditorGUILayout.EndVertical();
+                        EditorGUILayout.EndHorizontal();
+                    }, new Color(0.95f, 0.9f, 1f, 0.5f));
+                }
             }
 
             EditorGUILayout.EndVertical();
@@ -958,12 +973,15 @@ namespace GameLauncherCloud.Editor
             GLCApiClient.StartUploadResponse uploadResponse = null;
             bool callbackReceived = false;
 
+            // Use default build notes if empty
+            string notes = string.IsNullOrWhiteSpace(buildNotesInput) ? "Uploaded from Unity Extension" : buildNotesInput;
+            
             apiClient.StartUploadAsync(
                 appId,
                 Path.GetFileName(zipPath),
                 zipSize,
                 uncompressedSize,
-                buildNotesInput,
+                notes,
                 (success, message, response) =>
                 {
                     Debug.Log($"[GLC] StartUpload callback received - Success: {success}, Message: {message}");
@@ -1010,51 +1028,116 @@ namespace GameLauncherCloud.Editor
             buildMessageType = MessageType.Info;
             Repaint();
             
-            Debug.Log($"[GLC] Reading ZIP file into memory: {zipPath}");
-            byte[] zipData = File.ReadAllBytes(zipPath);
-            Debug.Log($"[GLC] ZIP file loaded into memory: {zipData.Length} bytes");
-            Debug.Log($"[GLC] Starting UploadFileAsync to: {uploadResponse.UploadUrl}");
-            
             bool uploadSuccess = false;
             bool uploadCallbackReceived = false;
-
-            apiClient.UploadFileAsync(
-                uploadResponse.UploadUrl,
-                zipData,
-                (success, message, progress) =>
-                {
-                    uploadProgress = progress;
-
-                    if (success && progress >= 1.0f)
+            List<GLCApiClient.PartETag> uploadedParts = null;
+            
+            // Check if we should use multipart upload
+            bool isMultipart = uploadResponse.PartUrls != null && uploadResponse.PartUrls.Count > 0;
+            
+            if (isMultipart)
+            {
+                Debug.Log($"[GLC] Starting multipart upload with {uploadResponse.PartUrls.Count} parts");
+                Debug.Log($"[GLC] Part size: {uploadResponse.PartSize.Value / (1024f * 1024f):F2} MB");
+                
+                apiClient.UploadMultipartAsync(
+                    zipPath,
+                    uploadResponse.PartUrls,
+                    (success, message, progress, parts) =>
                     {
-                        // Upload completed successfully
-                        uploadSuccess = true;
-                        uploadCallbackReceived = true;
-                        buildMessage = "✓ Upload completed! Notifying backend...";
-                        buildMessageType = MessageType.Info;
-                        Debug.Log($"[GLC] Upload callback - SUCCESS! Progress: {progress}");
-                    }
-                    else if (!success && progress == 0f && message != "Uploading...")
-                    {
-                        // Error occurred (but ignore initial "Uploading..." message)
-                        uploadSuccess = false;
-                        uploadCallbackReceived = true;
-                        buildMessage = $"Upload failed: {message}";
-                        buildMessageType = MessageType.Error;
-                        Debug.LogError($"[GLC] Upload callback - ERROR: {message}");
-                    }
-                    else
-                    {
-                        // Progress update (including initial "Uploading..." message)
-                        int percentage = Mathf.RoundToInt(progress * 100f);
-                        float sizeMB = zipSize / (1024f * 1024f);
-                        buildMessage = $"Step 2/3: Uploading to cloud storage ({percentage}% of {sizeMB:F2} MB)...";
-                        buildMessageType = MessageType.Info;
-                    }
+                        // Ensure callback executes on main thread
+                        EditorApplication.delayCall += () =>
+                        {
+                            uploadProgress = progress;
 
-                    Repaint();
-                }
-            );
+                            if (success && progress >= 1.0f && parts != null)
+                            {
+                                // Upload completed successfully
+                                uploadSuccess = true;
+                                uploadCallbackReceived = true;
+                                uploadedParts = parts;
+                                buildMessage = "✓ Upload completed! Notifying backend...";
+                                buildMessageType = MessageType.Info;
+                                Debug.Log($"[GLC] Multipart upload callback - SUCCESS! {parts.Count} parts uploaded");
+                            }
+                            else if (!success && progress == 0f && !message.Contains("part"))
+                            {
+                                // Error occurred
+                                uploadSuccess = false;
+                                uploadCallbackReceived = true;
+                                buildMessage = $"Upload failed: {message}";
+                                buildMessageType = MessageType.Error;
+                                Debug.LogError($"[GLC] Multipart upload callback - ERROR: {message}");
+                            }
+                            else if (!success && message.Contains("part"))
+                            {
+                                // Part error
+                                uploadSuccess = false;
+                                uploadCallbackReceived = true;
+                                buildMessage = $"Upload failed: {message}";
+                                buildMessageType = MessageType.Error;
+                                Debug.LogError($"[GLC] Multipart upload callback - PART ERROR: {message}");
+                            }
+                            else
+                            {
+                                // Progress update
+                                int percentage = Mathf.RoundToInt(progress * 100f);
+                                float sizeMB = zipSize / (1024f * 1024f);
+                                buildMessage = $"Step 2/3: {message} ({percentage}% of {sizeMB:F2} MB)...";
+                                buildMessageType = MessageType.Info;
+                            }
+
+                            Repaint();
+                        };
+                    }
+                );
+            }
+            else
+            {
+                Debug.Log($"[GLC] Starting single-part upload to: {uploadResponse.UploadUrl}");
+                
+                apiClient.UploadFileAsync(
+                    uploadResponse.UploadUrl,
+                    zipPath,
+                    (success, message, progress) =>
+                    {
+                        // Ensure callback executes on main thread
+                        EditorApplication.delayCall += () =>
+                        {
+                            uploadProgress = progress;
+
+                            if (success && progress >= 1.0f)
+                            {
+                                // Upload completed successfully
+                                uploadSuccess = true;
+                                uploadCallbackReceived = true;
+                                buildMessage = "✓ Upload completed! Notifying backend...";
+                                buildMessageType = MessageType.Info;
+                                Debug.Log($"[GLC] Upload callback - SUCCESS! Progress: {progress}");
+                            }
+                            else if (!success && progress == 0f && message != "Uploading...")
+                            {
+                                // Error occurred (but ignore initial "Uploading..." message)
+                                uploadSuccess = false;
+                                uploadCallbackReceived = true;
+                                buildMessage = $"Upload failed: {message}";
+                                buildMessageType = MessageType.Error;
+                                Debug.LogError($"[GLC] Upload callback - ERROR: {message}");
+                            }
+                            else
+                            {
+                                // Progress update (including initial "Uploading..." message)
+                                int percentage = Mathf.RoundToInt(progress * 100f);
+                                float sizeMB = zipSize / (1024f * 1024f);
+                                buildMessage = $"Step 2/3: Uploading to cloud storage ({percentage}% of {sizeMB:F2} MB)...";
+                                buildMessageType = MessageType.Info;
+                            }
+
+                            Repaint();
+                        };
+                    }
+                );
+            }
             
             // Wait for upload callback
             Debug.Log($"[GLC] Waiting for upload callback...");
@@ -1063,7 +1146,7 @@ namespace GameLauncherCloud.Editor
                 yield return null;
             }
             
-            Debug.Log($"[GLC] Upload completed. Success: {uploadSuccess}");
+            Debug.Log($"[GLC] Upload completed. Success: {uploadSuccess}, IsMultipart: {isMultipart}");
 
             if (!uploadSuccess)
             {
@@ -1088,7 +1171,7 @@ namespace GameLauncherCloud.Editor
                 uploadResponse.AppBuildId,
                 uploadResponse.Key,
                 uploadResponse.UploadId,
-                null, // parts - null for simple upload
+                uploadedParts, // parts - populated for multipart uploads, null for single-part
                 (success, message) =>
                 {
                     Debug.Log($"[GLC] NotifyFileReady callback received - Success: {success}, Message: {message}");
@@ -1119,184 +1202,181 @@ namespace GameLauncherCloud.Editor
             
             Debug.Log($"[GLC] NotifyFileReady completed. Success: {notifySuccess}");
 
-            isUploading = false;
-
-            // Cleanup
+            // Cleanup zip file
             try
             {
                 File.Delete(zipPath);
             }
             catch { }
 
+            // Upload process is complete
+            isUploading = false;
+            isBuilding = false;
+
             if (notifySuccess)
             {
-                if (EditorUtility.DisplayDialog("Success",
-                    "Build uploaded successfully! Do you want to view it in Game Launcher Cloud?",
-                    "Yes", "No"))
-                {
-                    Application.OpenURL($"{config.GetFrontendUrl()}/dashboard/apps/{appId}");
-                }
+                // Start monitoring build status
+                isMonitoringBuild = true;
+                buildMessage = "✓ Upload complete! Monitoring build progress...";
+                buildMessageType = MessageType.Info;
+                Repaint();
+                
+                yield return EditorCoroutineUtility.StartCoroutine(
+                    MonitorBuildStatus(uploadResponse.AppBuildId),
+                    this
+                );
             }
 
             Repaint();
         }
 
-        // ========== TIPS TAB ========== //
-
-        private void InitializeTips()
+        private IEnumerator MonitorBuildStatus(long appBuildId)
         {
-            tips = new List<TipItem>
+            Debug.Log($"[GLC] === Starting Build Status Monitor for Build #{appBuildId} ===");
+            
+            bool isMonitoring = true;
+            int pollCount = 0;
+            const int maxPolls = 600; // 50 minutes maximum (5 seconds * 600 = 50 minutes)
+            
+            while (isMonitoring && pollCount < maxPolls)
             {
-                new TipItem
+                pollCount++;
+                
+                bool statusReceived = false;
+                GLCApiClient.BuildStatusResponse statusResponse = null;
+                
+                apiClient.GetBuildStatusAsync(
+                    appBuildId,
+                    (success, message, response) =>
+                    {
+                        EditorApplication.delayCall += () =>
+                        {
+                            statusReceived = true;
+                            
+                            if (success && response != null)
+                            {
+                                statusResponse = response;
+                                
+                                // Update UI based on status
+                                string statusIcon = GetStatusIcon(response.Status);
+                                buildMessage = $"{statusIcon} Build #{appBuildId}: {response.Status}";
+                                
+                                // Add progress information if available
+                                if (response.StageProgress > 0)
+                                {
+                                    buildMessage += $" ({response.StageProgress}%)";
+                                }
+                                
+                                // Check if build is in final state
+                                if (response.Status == "Completed")
+                                {
+                                    buildMessage = $"✅ Build #{appBuildId} completed successfully!";
+                                    buildMessageType = MessageType.Info;
+                                    isMonitoring = false;
+                                    isMonitoringBuild = false;
+                                    
+                                    // Show success dialog
+                                    EditorApplication.delayCall += () =>
+                                    {
+                                        if (EditorUtility.DisplayDialog("Build Completed",
+                                            $"Build #{appBuildId} processed successfully!\n\nDo you want to view it in Game Launcher Cloud?",
+                                            "Yes", "No"))
+                                        {
+                                            Application.OpenURL($"{config.GetFrontendUrl()}/apps/id/{response.AppId}/builds");
+                                        }
+                                    };
+                                }
+                                else if (response.Status == "Failed")
+                                {
+                                    string errorMsg = string.IsNullOrEmpty(response.ErrorMessage) 
+                                        ? "Unknown error" 
+                                        : response.ErrorMessage;
+                                    buildMessage = $"❌ Build #{appBuildId} failed: {errorMsg}";
+                                    buildMessageType = MessageType.Error;
+                                    isMonitoring = false;
+                                    isMonitoringBuild = false;
+                                    
+                                    EditorUtility.DisplayDialog("Build Failed",
+                                        $"Build #{appBuildId} processing failed:\n\n{errorMsg}",
+                                        "OK");
+                                }
+                                else if (response.Status == "Cancelled" || response.Status == "Deleted")
+                                {
+                                    buildMessage = $"⚠️ Build #{appBuildId} was {response.Status.ToLower()}";
+                                    buildMessageType = MessageType.Warning;
+                                    isMonitoring = false;
+                                    isMonitoringBuild = false;
+                                }
+                                else
+                                {
+                                    // Still processing
+                                    buildMessageType = MessageType.Info;
+                                }
+                            }
+                            else
+                            {
+                                Debug.LogWarning($"[GLC] Failed to get build status: {message}");
+                                // Don't stop monitoring on temporary errors
+                            }
+                            
+                            Repaint();
+                        };
+                    }
+                );
+                
+                // Wait for status callback
+                float timeout = 0f;
+                while (!statusReceived && timeout < 10f) // 10 second timeout per request
                 {
-                    title = "Optimize Build Size",
-                    description = "Reduce your build size by:\n" +
-                        "• Compressing textures (use appropriate formats like DXT, ASTC)\n" +
-                        "• Removing unused assets\n" +
-                        "• Using Asset Bundles for large content\n" +
-                        "• Enabling code stripping in Build Settings",
-                    icon = "💡"
-                },
-                new TipItem
-                {
-                    title = "Use Descriptive Build Notes",
-                    description = "Always include meaningful build notes:\n" +
-                        "• Version number\n" +
-                        "• New features added\n" +
-                        "• Bugs fixed\n" +
-                        "• Known issues\n" +
-                        "This helps your team and players understand what changed.",
-                    icon = "📝"
-                },
-                new TipItem
-                {
-                    title = "Test Before Uploading",
-                    description = "Always test your build locally before uploading:\n" +
-                        "• Run the build on target platform\n" +
-                        "• Check for crashes or errors\n" +
-                        "• Verify all features work\n" +
-                        "• Test performance",
-                    icon = "🧪"
-                },
-                new TipItem
-                {
-                    title = "Use Version Control",
-                    description = "Keep your Unity project in version control (Git):\n" +
-                        "• Track changes to your project\n" +
-                        "• Collaborate with team members\n" +
-                        "• Revert problematic changes\n" +
-                        "• Tag releases for easy reference",
-                    icon = "🔀"
-                },
-                new TipItem
-                {
-                    title = "Regular Backups",
-                    description = "Always maintain backups:\n" +
-                        "• Use cloud storage for project files\n" +
-                        "• Keep old build versions\n" +
-                        "• Document build configurations\n" +
-                        "• Save build settings separately",
-                    icon = "💾"
-                },
-                new TipItem
-                {
-                    title = "Monitor Upload Limits",
-                    description = "Be aware of your plan limits:\n" +
-                        "• Check compressed build size limits\n" +
-                        "• Monitor uncompressed size limits\n" +
-                        "• Optimize builds to stay within limits\n" +
-                        "• Upgrade plan if needed",
-                    icon = "📊"
-                },
-                new TipItem
-                {
-                    title = "Platform-Specific Builds",
-                    description = "Create separate builds for each platform:\n" +
-                        "• Windows 64-bit\n" +
-                        "• Linux 64-bit\n" +
-                        "• macOS\n" +
-                        "Each platform needs its own optimized build.",
-                    icon = "🖥️"
-                },
-                new TipItem
-                {
-                    title = "Incremental Patches",
-                    description = "Use incremental patches for updates:\n" +
-                        "• Only upload changed content when possible\n" +
-                        "• Keep patch sizes small\n" +
-                        "• Test patches thoroughly\n" +
-                        "• Provide rollback options",
-                    icon = "📦"
+                    timeout += 0.1f;
+                    yield return new WaitForSeconds(0.1f);
                 }
+                
+                // Wait 5 seconds before next poll (if still monitoring)
+                if (isMonitoring)
+                {
+                    yield return new WaitForSeconds(5f);
+                }
+            }
+            
+            if (pollCount >= maxPolls)
+            {
+                buildMessage = $"⚠️ Build #{appBuildId} monitoring timed out. Check status manually.";
+                buildMessageType = MessageType.Warning;
+                isMonitoringBuild = false;
+                Repaint();
+            }
+            
+            Debug.Log($"[GLC] === Build Status Monitor Ended ===");
+        }
+        
+        private string GetStatusIcon(string status)
+        {
+            return status switch
+            {
+                "Pending" => "⏳",
+                "GeneratingPresignedUrl" => "🔗",
+                "UploadingBuild" => "⬆️",
+                "Enqueued" => "📋",
+                "DownloadingBuild" => "⬇️",
+                "DownloadingPreviousBuild" => "⬇️",
+                "UnzippingBuild" => "📦",
+                "UnzippingPreviousBuild" => "📦",
+                "CreatingPatch" => "🔧",
+                "DeployingPatch" => "🚀",
+                "Completed" => "✅",
+                "Failed" => "❌",
+                "Cancelled" => "⚠️",
+                "Deleted" => "🗑️",
+                _ => "📊"
             };
         }
 
-        private void DrawTipsTab()
-        {
-            GUILayout.Space(10);
+        // ========== TIPS TAB ========== //
 
-            EditorGUILayout.BeginVertical(cardStyle);
 
-            GUILayout.Label("💡 Best Practices & Tips", sectionHeaderStyle);
-            EditorGUILayout.Space(5);
-            
-            DrawInfoBox("Follow these professional tips to create better patches and improve your development workflow.", MessageType.Info);
 
-            EditorGUILayout.Space(10);
 
-            tipsScrollPosition = EditorGUILayout.BeginScrollView(tipsScrollPosition);
-
-            for (int i = 0; i < tips.Count; i++)
-            {
-                DrawModernTip(tips[i], i);
-                if (i < tips.Count - 1)
-                    EditorGUILayout.Space(8);
-            }
-
-            EditorGUILayout.EndScrollView();
-
-            EditorGUILayout.EndVertical();
-
-            GUILayout.Space(10);
-        }
-
-        private void DrawModernTip(TipItem tip, int index)
-        {
-            // Alternate colors for visual distinction
-            Color cardColor = index % 2 == 0 
-                ? new Color(0.95f, 0.97f, 1f, 0.3f) 
-                : new Color(1f, 0.97f, 0.95f, 0.3f);
-
-            DrawCard(() =>
-            {
-                EditorGUILayout.BeginHorizontal();
-                
-                // Icon
-                GUIStyle iconStyle = new GUIStyle(EditorStyles.boldLabel);
-                iconStyle.fontSize = 24;
-                iconStyle.fixedWidth = 40;
-                iconStyle.alignment = TextAnchor.MiddleCenter;
-                GUILayout.Label(tip.icon, iconStyle, GUILayout.Width(40));
-                
-                // Content
-                EditorGUILayout.BeginVertical();
-                
-                GUIStyle titleStyle = new GUIStyle(EditorStyles.boldLabel);
-                titleStyle.fontSize = 13;
-                GUILayout.Label(tip.title, titleStyle);
-                
-                EditorGUILayout.Space(3);
-                
-                GUIStyle descStyle = new GUIStyle(EditorStyles.wordWrappedLabel);
-                descStyle.fontSize = 11;
-                descStyle.padding = new RectOffset(0, 0, 2, 2);
-                GUILayout.Label(tip.description, descStyle);
-                
-                EditorGUILayout.EndVertical();
-                
-                EditorGUILayout.EndHorizontal();
-            }, cardColor);
-        }
 
         // ========== DEVELOPER TAB ========== //
 
@@ -1435,15 +1515,6 @@ namespace GameLauncherCloud.Editor
             }
 
             EditorGUILayout.EndVertical();
-        }
-
-        // ========== HELPER CLASSES ========== //
-
-        private class TipItem
-        {
-            public string title;
-            public string description;
-            public string icon;
         }
     }
 

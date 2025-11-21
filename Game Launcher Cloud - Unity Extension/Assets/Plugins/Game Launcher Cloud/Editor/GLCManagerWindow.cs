@@ -17,7 +17,7 @@ namespace GameLauncherCloud.Editor
         // ========== DEVELOPER SETTINGS ========== //
 
         // Set to true to show Developer tab, false to hide it from end users
-        private const bool SHOW_DEVELOPER_TAB = true;
+        private const bool SHOW_DEVELOPER_TAB = false;
 
         // ========== WINDOW PROPERTIES ========== //
 
@@ -175,6 +175,15 @@ namespace GameLauncherCloud.Editor
         private void OnEnable()
         {
             config = GLCConfigManager.LoadConfig();
+            
+            // Force Production environment when Developer tab is disabled
+            if (!SHOW_DEVELOPER_TAB && config.environment != GLCEnvironment.Production)
+            {
+                config.environment = GLCEnvironment.Production;
+                GLCConfigManager.SaveConfig(config);
+                Debug.Log($"[GLC] OnEnable - Forced environment to Production (Developer tab disabled)");
+            }
+            
             Debug.Log($"[GLC] OnEnable - Config loaded. Environment: {config.environment}, API URL: {config.GetApiUrl()}");
             Debug.Log($"[GLC] OnEnable - Auth token length: {config.authToken?.Length ?? 0} chars");
             Debug.Log($"[GLC] OnEnable - User email: {config.userEmail}");

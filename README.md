@@ -1,6 +1,6 @@
 # Game Launcher Cloud - Manager for Unity
 
-**Promote your game development with Game Launcher Cloud!**
+**Build and uploads your game from Unity to Game Launcher Cloud!**
 
 A powerful Unity Editor extension that allows you to build and upload your game patches directly to [Game Launcher Cloud](https://gamelauncher.cloud) platform from within Unity.
 

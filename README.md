@@ -26,22 +26,22 @@ A powerful Unity Editor extension that allows you to build and upload your game 
 
 ## 📦 Installation
 
-1. Download the latest release from [GitHub Releases](https://github.com/GameLauncherCloud/GameLauncherCloud-UnityExtension/releases)
-2. Import the `.unitypackage` into your Unity project
-3. The extension will be available under **Game Launcher Cloud > Manager for Unity** menu
+1. Download the latest release from [Unity Asset Store](https://assetstore.unity.com/packages/tools/utilities/game-launcher-cloud-manager-for-unity-245359)
+2. Import into your Unity project
+3. The extension will be available under **Tools/Game Launcher Cloud > Manager** menu
 
 ## 🚀 Quick Start
 
 ### Step 1: Get Your API Key
 
 1. Go to [Game Launcher Cloud Dashboard](https://app.gamelauncher.cloud)
-2. Navigate to **Settings > API Keys**
+2. Navigate to **User Profile > API Keys**
 3. Click **Create New API Key**
 4. Copy your API key
 
 ### Step 2: Connect to Game Launcher Cloud
 
-1. In Unity, open **Game Launcher Cloud > Manager for Unity**
+1. In Unity, open **Tools/Game Launcher Cloud > Manager**
 2. Go to the **Login** tab
 3. Paste your API Key
 4. Click **Login with API Key**
@@ -62,7 +62,7 @@ A powerful Unity Editor extension that allows you to build and upload your game 
 The extension supports authentication via **API Keys**. This is the recommended method for automated builds and CI/CD pipelines.
 
 To get an API Key:
-- Visit [Game Launcher Cloud Dashboard](https://app.gamelauncher.cloud/dashboard/settings/api-keys)
+- Visit [Game Launcher Cloud Dashboard](https://app.gamelauncher.cloud/user/api-keys)
 - Create a new API key with appropriate permissions
 - Copy and save the key securely
 
@@ -119,10 +119,9 @@ Always include:
 
 Need help? We're here for you!
 
-- 📧 Email: support@gamelauncher.cloud
+- 🌐 Website: [gamelauncher.cloud](https://gamelauncher.cloud)
 - 💬 Discord: [Join our community](https://discord.com/invite/FpWvUQ2CJP)
 - 📚 Documentation: [docs.gamelauncher.cloud](https://help.gamelauncher.cloud)
-- 🌐 Website: [gamelauncher.cloud](https://gamelauncher.cloud)
 
 ## 📝 License
 
@@ -131,6 +130,7 @@ This extension is provided free of charge for use with Game Launcher Cloud platf
 ## 🎮 About Game Launcher Cloud
 
 Game Launcher Cloud is a comprehensive platform for game developers to:
+- Create custom game launchers in minutes
 - Distribute game patches efficiently
 - Manage multiple games and versions
 - Track downloads and analytics

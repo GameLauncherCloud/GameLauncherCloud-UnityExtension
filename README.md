@@ -1,6 +1,19 @@
+<div align="center">
+   
 # Game Launcher Cloud - Manager for Unity
+### **The Next-Generation Custom Game Launchers Creator Platform**
+   
+<img width="2800" height="720" alt="Game Launcher Cloud for Unity - Full Logo with Background" src="https://github.com/user-attachments/assets/b54c9b97-dac8-4e90-aa6e-81deafc4daed" />
 
-<img width="2800" height="720" alt="Game Launcher Cloud for Unity - Full Logo with Background" src="https://github.com/user-attachments/assets/da8ce802-3dd2-4d60-b562-bea6a8f0e937" />
+
+**Build and upload your game from Unreal Engine to Game Launcher Cloud!**
+
+[![Website](https://img.shields.io/badge/Website-gamelauncher.cloud-blue?style=for-the-badge&logo=internet-explorer)](https://gamelauncher.cloud/)
+[![Status](https://img.shields.io/badge/Status-Live-success?style=for-the-badge)](https://gamelauncher.cloud/)
+[![Platform](https://img.shields.io/badge/Platform-Cross--Platform-orange?style=for-the-badge)](https://gamelauncher.cloud/)
+[![Unity Extension](https://img.shields.io/badge/Unity-AssetStore-white?style=for-the-badge&logo=unity)](https://assetstore.unity.com/packages/tools/utilities/game-launcher-cloud-manager-for-unity-245359?srsltid=AfmBOoryQwHxR5Kdg4yukaEysaNJH0VNGp3g_jVXxCTb3AAfi1S2Yxya)
+
+</div>
 
 **Build and upload your game from Unity to Game Launcher Cloud!**
 
